@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('codes', function (Blueprint $table) {
             $table->id()->primary();
             $table->longtext('code_pic')->charset('binary');//LONGBLOB
-            $table->geography('location', subtype: 'point', srid: 4326);
+            $table->geometry('location', subtype: 'point', srid: 4326);
             $table->tinyInteger('availability');
 
         });

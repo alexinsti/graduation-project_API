@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id()->primary();
             $table->String('name');
             $table->String('password');
+            $table->text('description')->nullable();
             $table->Integer('amount_of_codes');
             $table->dateTime('starting_date');
-            $table->geography('starting_point', subtype: 'point', srid: 4326);
+            $table->geometry('starting_point', subtype: 'point', srid: 4326);
             $table->longtext('gymkhana_pic')->charset('binary');//LONGBLOB;
             $table->tinyInteger('state');
             $table->tinyInteger('availability');

@@ -16,12 +16,17 @@ class AuthController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'username'=>'required|string|max:255',
-                'nickname' => 'required|string|max:255', 
+                'username'=>'required|string|max:255|unique:users',
+                'nickname' => 'required|string|max:255',
                 'email'=>'required|string|email|max:255|unique:users',
-                'password'=>'required|string|min:8'
+                'password'=>'required|string|min:8|confirmed'
             ]
         );
+
+        // Verificar si la validación falla
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
 
         $user=User::create(
             [
@@ -36,8 +41,8 @@ class AuthController extends Controller
 
         return response()->json(
             [
-                'data'=>$user, 
-                'access_token'=>$token, 
+                'data'=>$user,
+                'access_token'=>$token,
                 'token_type'=>'Bearer',
             ]
             );
@@ -48,7 +53,7 @@ class AuthController extends Controller
         if(!Auth::attempt($request->only('email', 'password'))){
             return response()->json(['message'=>'Unauthorized'], 401);
         }
-        
+
         auth()->user()->tokens()->delete(); //Delete every other token related to this user so there is only one active session
 
         $user = User::where('email', $request['email'])->firstOrFail();
@@ -65,7 +70,7 @@ class AuthController extends Controller
     }
 
     public function logout(Request $request){
-
+        $user = $request->user();
         auth()->user()->tokens()->delete();
 
         return [

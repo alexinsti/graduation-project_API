@@ -4,23 +4,42 @@ namespace App\Http\Controllers;
 
 use App\Models\Code;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CodeController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * @throws \Exception
      */
     public function index()
     {
         //dd('hola');
         $codes=Code::all();
         $response=[];
-        foreach($codes as $code){
+        /*foreach($codes as $code){
             $code["code_pic"]=base64_encode($code['code_pic']);//we need to encode the binary data to be able to send as json
-            $code["location"]=base64_encode($code['code_pic']);//we need to encode the binary data to be able to send as json
+            $code["location"]=$code['location'];
+            $response[]=$code->toArray();
+        }*/
+        $latitude = 37.165319;
+        $longitude = -3.662096;
+        $distance = 89; // Distancia en metros
+        $codesWithinDistance = Code::withinDistanceOf($latitude, $longitude, $distance)->get();
+        foreach($codesWithinDistance as $code){
+            $code["code_pic"]=base64_encode($code['code_pic']);//we need to encode the binary data to be able to send as json
+            $code["location"]=$code['location'];
             $response[]=$code->toArray();
         }
+        //dd($codesWithinDistance);
+/*
+ SELECT ST_DISTANCE_SPHERE(
+    ST_GeomFromText('POINT(37.165319 -3.662096)', 4326),
+    ST_GeomFromText('POINT(37.165665 -3.662816)', 4326)
+) AS distance_in_meters;
+*/
         //dd($response);
+        //return $codesWithinDistance;
         return response()->json($response);
     }
     /* VERSION CON MAP

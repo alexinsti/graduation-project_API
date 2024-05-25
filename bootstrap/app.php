@@ -16,4 +16,13 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })->withMiddleware(function (Middleware $middleware) {
+        $middleware->validateCsrfTokens(except: [
+            'api/user',
+            'api/logout',
+            'api/codes',
+            'api/register',
+            'api/login',
+            'forgot-password'
+        ]);
+})->create();
