@@ -18,7 +18,6 @@ class Gymkhana extends Model
         'password',
         'description',
         'amount_of_codes',
-        'starting_date',
         'starting_point',
         'gymkhana_pic',
         'state',

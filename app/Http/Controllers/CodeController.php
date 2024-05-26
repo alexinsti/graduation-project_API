@@ -38,6 +38,7 @@ class CodeController extends Controller
     ST_GeomFromText('POINT(37.165665 -3.662816)', 4326)
 ) AS distance_in_meters;
 */
+        dd(Code::byAvailability('1')->get());
         //dd($response);
         //return $codesWithinDistance;
         return response()->json($response);

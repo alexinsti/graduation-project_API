@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('gymkhanas', function (Blueprint $table) {
             $table->id()->primary();
             $table->String('name');
-            $table->String('password');
+            $table->String('password')->nullable();
             $table->text('description')->nullable();
             $table->Integer('amount_of_codes');
-            $table->dateTime('starting_date');
             $table->geometry('starting_point', subtype: 'point', srid: 4326);
             $table->longtext('gymkhana_pic')->charset('binary');//LONGBLOB;
             $table->tinyInteger('state');

@@ -2,80 +2,50 @@
 
 namespace App\Services;
 
-use App\Models\Participation;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Code;
+use App\Models\Code_to_validate;
+use App\Models\Relation;
 
 class CodeService
 {
-    public function getParticipationByUserId($userId)
+
+    public function createCode($code_pic_Base64, $location)
     {
-        return Participation::byUserId($userId)->get();
+        $code_pic=Base64_decode($code_pic_Base64);
+        $code=Code::create([
+            'code_pic' => $code_pic,
+            'location' => $location,
+            'availability' => 1,
+        ]);
+        return $code->id;
+
+    }
+    public function getCodeByAvailability($availability)
+    {
+        return Code::where('availability', $availability)->get();
     }
 
-    public function getParticipationByGymkhanaId($gymkhanaId)
+    public function updateCodeAvailability($id, $availability)
     {
-        return Participation::byGymkhanaId($gymkhanaId)->get();
+        Code::findOrFail($id)->update(['availability'=>$availability]);
+        return true;
     }
-
-    public function getParticipationByPrivilege($privilege)
+    public function setAvailabilityAsPublic($id)
     {
-        return Participation::byPrivilege($privilege)->get();
+        Code::findOrFail($id)->update(['availability' => 1]);
+        return true;
     }
-
-    public function updateParticipationPrivilege($id, $privilege)
+    public function setAvailabilityAsPrivate($id)
     {
-        Participation::findOrFail($id)->update(['privilege'=>$privilege]);
+        Code::findOrFail($id)->update(['availability' => 0]);
         return true;
     }
 
-    public function setPrivilegeAsOwner($id)
+    public function deleteCode($id)
     {
-        Participation::findOrFail($id)->update(['privilege' => 1]);
-        return true;
-    }
-    public function setPrivilegeAsAdmin($id)
-    {
-        Participation::findOrFail($id)->update(['privilege' => 2]);
-        return true;
-    }
-    public function setPrivilegeAsSupervisor($id)
-    {
-        Participation::findOrFail($id)->update(['privilege' => 3]);
-        return true;
-    }
-    public function setPrivilegeAsPlayer($id)
-    {
-        Participation::findOrFail($id)->update(['privilege' => 4]);
-        return true;
-    }
-    public function setPrivilegeAsWinner($id)
-    {
-        Participation::findOrFail($id)->update(['privilege' => 5]);
-        return true;
-    }
-
-    public function blockUserParticipation($id)
-    {
-        Participation::findOrFail($id)->update(['privilege' => 101]);
-        return true;
-    }
-
-
-    public function deleteParticipation($id)
-    {
-        Participation::findOrFail($id)->delete();
-        return true;
-    }
-
-    public function deleteUserParticipations($userId)
-    {
-        Participation::where('id_user', $userId)->delete();
-        return true;
-    }
-
-    public function deleteGymkhanaParticipations($gymkhanaId)
-    {
-        Participation::where('id_gymkhana', $gymkhanaId)->delete();
+        Relation::where('id_code', $id)->delete();
+        Code_to_validate::where('id_code', $id)->delete();
+        Code::findOrFail($id)->delete();
         return true;
     }
 
