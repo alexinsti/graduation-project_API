@@ -9,6 +9,8 @@ class Participation extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'id_user',
         'id_gymkhana',

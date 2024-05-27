@@ -15,9 +15,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return $request->user();
     });
     Route::get('logout', [AuthController::class, 'logout']);
+    //CODES
+    Route::get('codes', [CodeController::class, 'index']);
+    Route::post('createCode', [CodeController::class, 'create']);
+    Route::post('destroyCode', [CodeController::class, 'destroy']);
+    Route::post('updateCode', [CodeController::class, 'update']);
+    Route::patch('setAvailabilityToPublic', [CodeController::class, 'setAvailabilityToPublic']);
+    Route::patch('setAvailabilityToPrivate', [CodeController::class, 'setAvailabilityToPrivate']);
+
+
 });
 
-Route::get('codes', [CodeController::class, 'index']);
+
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);

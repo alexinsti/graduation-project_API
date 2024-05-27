@@ -17,11 +17,12 @@ return new class extends Migration
         READS SQL DATA
         BEGIN
             DECLARE amount_of_codes INT;
-        
+
             SELECT COUNT(*) INTO amount_of_codes
             FROM codes_to_validate
-            WHERE id_gymkhana = p_id_gymkhana ;
-        
+            WHERE id_gymkhana = p_id_gymkhana
+            AND privilege = 1;
+
             RETURN amount_of_codes;
         END
         ');

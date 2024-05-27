@@ -9,6 +9,9 @@ class Code_to_validate extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+    protected $table = 'codes_to_validate';
+
 
 
 

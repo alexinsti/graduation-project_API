@@ -13,6 +13,8 @@ class Gymkhana extends Model
     use HasFactory;
     use HasSpatial;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'name',
         'password',

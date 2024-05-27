@@ -23,7 +23,6 @@ class AuthController extends Controller
             ]
         );
 
-        // Verificar si la validación falla
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }

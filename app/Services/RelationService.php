@@ -6,12 +6,12 @@ use App\Models\Relation;
 
 class RelationService
 {
-    public function getPrivilege($id)
+    public static function getPrivilege($id)
     {
         return Relation::where('id', $id)->value('privilege');
     }
 
-    public function createRelationAsOwner($userId, $codeId)
+    public static function createRelationAsOwner($userId, $codeId)
     {
         Relation::create([
             'id_user' => $userId,
@@ -22,7 +22,7 @@ class RelationService
 
     }
 
-    public function createRelationAsWinner($userId, $codeId)
+    public static function createRelationAsWinner($userId, $codeId)
     {
         Relation::create([
             'id_user' => $userId,
@@ -33,28 +33,28 @@ class RelationService
 
     }
 
-    public function getRelationByUserId($userId)
+    public static function getRelationByUserId($userId)
     {
         return Relation::where('id_user', $userId)->whereHas('code', function ($query) {
             $query->where('availability', 1);
         })->get();
     }
 
-    public function getRelationByCodeId($codeId)
+    public static function getRelationByCodeId($codeId)
     {
         return Relation::where('id_code', $codeId)->whereHas('code', function ($query) {
             $query->where('availability', 1);
         })->get();
     }
 
-    public function getRelationByPrivilege($privilege)
+    public static function getRelationByPrivilege($privilege)
     {
         return Relation::where('privilege', $privilege)->whereHas('code', function ($query) {
             $query->where('availability', 1);
         })->get();
     }
 
-    public function getRelationsByOwner($userId)
+    public static function getRelationsByOwner($userId)
     {
         $codeIds = Relation::where('id_user', $userId)
             ->where('privilege', 1)
@@ -63,7 +63,7 @@ class RelationService
         return Relation::whereIn('id_code', $codeIds)->get();
     }
 
-    public function getRelationsByWinner($userId)
+    public static function getRelationsByWinner($userId)
     {
         $codeIds = Relation::where('id_user', $userId)
             ->where('privilege', 5)
@@ -74,19 +74,19 @@ class RelationService
         })->get();
     }
 
-    public function deleteRelation($id)
+    public static function deleteRelation($id)
     {
         Relation::findOrFail($id)->delete();
         return true;
     }
 
-    public function deleteUserRelations($userId)
+    public static function deleteUserRelations($userId)
     {
         Relation::where('id_user', $userId)->delete();
         return true;
     }
 
-    public function deleteCodeRelations($codeId)
+    public static function deleteCodeRelations($codeId)
     {
         Relation::where('id_code', $codeId)->delete();
         return true;

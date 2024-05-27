@@ -13,6 +13,8 @@ class Code extends Model
     use HasFactory;
     use HasSpatial;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'code_pic',
         'location',
