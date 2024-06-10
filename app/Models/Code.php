@@ -18,7 +18,8 @@ class Code extends Model
     protected $fillable = [
         'code_pic',
         'location',
-        'availability'
+        'availability',
+        'reported',
     ];
 
     protected $casts = [

@@ -23,6 +23,7 @@ class User extends Authenticatable implements CanResetPassword
         'nickname',
         'email',
         'password',
+        'reported',
     ];
 
     public function participations(): \Illuminate\Database\Eloquent\Relations\HasMany

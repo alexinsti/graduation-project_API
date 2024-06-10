@@ -17,6 +17,7 @@ class RelationService
             'id_user' => $userId,
             'id_code' => $codeId,
             'privilege' => 1,
+            'follow' => 0,
         ]);
         return true;
 
@@ -28,6 +29,19 @@ class RelationService
             'id_user' => $userId,
             'id_code' => $codeId,
             'privilege' => 5,
+            'follow' => 0,
+        ]);
+        return true;
+
+    }
+
+    public static function createRelationAsFollower($userId, $codeId)
+    {
+        Relation::create([
+            'id_user' => $userId,
+            'id_code' => $codeId,
+            'privilege' => 6,
+            'follow' => 1,
         ]);
         return true;
 
@@ -72,6 +86,79 @@ class RelationService
         return Relation::whereIn('id_code', $codeIds)->whereHas('code', function ($query) {
             $query->where('availability', 1);
         })->get();
+    }
+
+    /*
+     *
+     * Get the user's relations as owner
+     *
+     */
+    public static function getRelationsWhereUserIsOwner($userId)
+    {
+        return Relation::where('id_user', $userId)
+            ->where('privilege', 1)
+            ->get();
+
+    }
+
+    /*
+     *
+     * Get the user's relations as winner
+     *
+     */
+    public static function getRelationsWhereUserIsWinner($userId)
+    {
+        return Relation::where('id_user', $userId)
+            ->where('privilege', 5)
+            ->whereHas('code', function ($query) {
+                $query->where('availability', 1);
+            })->get();
+
+    }
+
+    /*
+     *
+     * Get the user's relations as follower
+     *
+     */
+    public static function getRelationsWhereUserIsFollower($userId)
+    {
+        return Relation::where('id_user', $userId)
+            ->where('privilege', 6)
+            ->whereHas('code', function ($query) {
+                $query->where('availability', 1);
+            })->get();
+
+    }
+
+    public static function updatePrivilege($id, $privilege){
+        Relation::findOrFail($id)->update(['privilege' => $privilege]);
+        return true;
+    }
+
+    public static function setPrivilegeAsOwner($id){
+        Relation::findOrFail($id)->update(['privilege' => 1]);
+        return true;
+    }
+
+    public static function setPrivilegeAsWinner($id){
+        Relation::findOrFail($id)->update(['privilege' => 5]);
+        return true;
+    }
+
+    public static function setPrivilegeAsFollower($id){
+        Relation::findOrFail($id)->update(['privilege' => 6]);
+        return true;
+    }
+
+    public static function follow($id){
+        Relation::findOrFail($id)->update(['follow' => 1]);
+        return true;
+    }
+
+    public static function unfollow($id){
+        Relation::findOrFail($id)->update(['follow' => 0]);
+        return true;
     }
 
     public static function deleteRelation($id)

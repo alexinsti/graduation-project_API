@@ -32,7 +32,8 @@ class AuthController extends Controller
                 'username'=>$request->username,
                 'nickname' => $request->nickname,
                 'email'=>$request->email,
-                'password'=>Hash::make($request->password)
+                'password'=>Hash::make($request->password),
+                'reported'=>0
             ]
         );
 
@@ -56,6 +57,7 @@ class AuthController extends Controller
         auth()->user()->tokens()->delete(); //Delete every other token related to this user so there is only one active session
 
         $user = User::where('email', $request['email'])->firstOrFail();
+        $user->profile_pic=base64_encode($user->profile_pic);
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json(
@@ -64,6 +66,7 @@ class AuthController extends Controller
                 'accessToken' => $token,
                 'token_type' => 'Bearer',
                 'user' => $user,
+
             ]
         );
     }

@@ -8,19 +8,25 @@ use App\Models\Participation;
 
 class Code_to_validateService
 {
-    public function createCode_to_validateAsOwner($userId, $gymkhanaId, $codeId)
+    public static function getPrivilege($userId, $gymkhanaId, $codeId){
+        return Code_to_validate::where('id_user', $userId)
+            ->where('id_gymkhana', $gymkhanaId)
+            ->where('id_code', $codeId)
+            ->value('privilege');
+    }
+    public static function createCode_to_validateAsOwner($userId, $gymkhanaId, $codeId)
     {
         Code_to_validate::create([
             'id_user' => $userId,
             'id_gymkhana' => $gymkhanaId,
-            'code_id' => $codeId,
+            'id_code' => $codeId,
             'privilege' => 1,
         ]);
         return true;
 
     }
 
-    public function createCode_to_validateAsPlayer($userId, $gymkhanaId, $codeId)
+    public static function createCode_to_validateAsPlayer($userId, $gymkhanaId, $codeId)
     {
         $code_to_validate=Code_to_validate::create([
             'id_user' => $userId,
@@ -32,7 +38,7 @@ class Code_to_validateService
 
     }
 
-    public function getCode_to_validateByUserId($userId)
+    public static function getCode_to_validateByUserId($userId)
     {
         return Code_to_validate::where('id_user', $userId)
             ->whereHas('gymkhana', function ($query) {
@@ -43,7 +49,7 @@ class Code_to_validateService
             })->get();
     }
 
-    public function getCode_to_validateByGymkhanaId($gymkhanaId)
+    public static function getCode_to_validateByGymkhanaId($gymkhanaId)
     {
         return Code_to_validate::where('id_gymkhana', $gymkhanaId)
             ->whereHas('gymkhana', function ($query) {
@@ -54,7 +60,7 @@ class Code_to_validateService
             })->get();
     }
 
-    public function getCode_to_validateByPrivilege($privilege)
+    public static function getCode_to_validateByPrivilege($privilege)
     {
         return Code_to_validate::where('privilege', $privilege)
             ->whereHas('gymkhana', function ($query) {
@@ -65,17 +71,37 @@ class Code_to_validateService
             })->get();
     }
 
-    public function getCodes_to_validateByOwner($userLatitude, $userLongitude)
+    public static function getCodesToAddAsOwnerOf($userId, $gymkhanaId, $userLatitude, $userLongitude){
+        $maxDistance = 10;
+
+        $codesAlreadyInIds = Code_to_validate::where('id_user', $userId)
+            ->where('id_gymkhana', $gymkhanaId)
+            ->where('privilege', 1)
+            ->pluck('id_code');
+
+        $codesAvailable = Code::where('availability', 1)
+            ->whereNotIn('id', $codesAlreadyInIds)
+            ->withinDistanceOf($userLatitude, $userLongitude, $maxDistance)
+            ->get();
+
+
+        return $codesAvailable;
+    }
+
+    public static function getCodes_to_validateByOwner($userLatitude, $userLongitude)
     {
         $maxDistance = 10;
 
         return Code::where('availability', 1)
-            ->withinDistanceOf($userLatitude, $userLongitude, $maxDistance);
+            ->withinDistanceOf($userLatitude, $userLongitude, $maxDistance)
+            ->get();
     }
-
-    public function getCode_to_validateAsPlayerOf($gymkhanaId, $userId, $userLatitude, $userLongitude)
+/*
+ * Listo, funciona
+ * */
+    public static function getCode_to_validateAsPlayerOf($userId, $gymkhanaId, $userLatitude, $userLongitude)
     {
-        $maxDistance = 5;
+        $maxDistance = 10;
 
         $ownerId = Participation::where('id_gymkhana', $gymkhanaId)
             ->where('privilege', 1)->value('id_user');
@@ -107,14 +133,16 @@ class Code_to_validateService
             ->get();
     }
 
-    public function getValidated_codesAsOwnerOf($gymkhanaId, $userToCheckId)
+
+    public static function getUserValidated_codesAsOwnerOf($gymkhanaId, $userToCheckId)
     {
         return Code_to_validate::where('id_gymkhana', $gymkhanaId)
             ->where('id_user', $userToCheckId)
-            ->where('privilege', 4);
+            ->where('privilege', 4)
+            ->get();
     }
 
-    public function getValidated_codesAsAdminOf($gymkhanaId, $userToCheckId)
+    public static function getUserValidated_codesAsAdminOf($gymkhanaId, $userToCheckId)
     {
         return Code_to_validate::where('id_gymkhana', $gymkhanaId)
             ->where('id_user', $userToCheckId)
@@ -128,7 +156,7 @@ class Code_to_validateService
 
     }
 
-    public function geValidated_codesAsSupervisorOf($gymkhanaId, $userToCheckId)
+    public static function getUserValidated_codesAsSupervisorOf($gymkhanaId, $userToCheckId)
     {
         return Code_to_validate::where('id_gymkhana', $gymkhanaId)
             ->where('id_user', $userToCheckId)
@@ -141,7 +169,12 @@ class Code_to_validateService
             })->get();
     }
 
-    public function getValidated_codesAsPlayer($userToCheckId, $gymkhanaId)
+    /*
+     *
+     * MAkes no sense since it would be used to cheat
+     *
+     */
+    public static function getUserValidated_codesAsPlayer($userToCheckId, $gymkhanaId)
     {
         return Code_to_validate::where('id_gymkhana', $gymkhanaId)
             ->where('id_user', $userToCheckId)
@@ -154,7 +187,12 @@ class Code_to_validateService
             })->get();
     }
 
-    public function getValidated_codesAsWinnerOf($gymkhanaId, $userId)
+    /*
+     *
+     * Makes no sense since every winner has the same codes
+     *
+     */
+    public static function getUserValidated_codesAsWinnerOf($gymkhanaId, $userId)
         {
             return Code_to_validate::where('id_gymkhana', $gymkhanaId)
                 ->where('id_user', $userId)
@@ -168,13 +206,13 @@ class Code_to_validateService
                 ->get();
         }
 
-    public function deleteCode_to_validate($id)
+    public static function deleteCode_to_validate($id)
     {
         Code_to_validate::findOrFail($id)->delete();
         return true;
     }
 
-    public function deleteUserCodes_to_validate($userId, $gymkhanaId)
+    public static function deleteUserCodes_to_validateInGymkhana($userId, $gymkhanaId)
     {
         Code_to_validate::where('id_user', $userId)
             ->where('id_gymkhana', $gymkhanaId)
@@ -182,7 +220,7 @@ class Code_to_validateService
         return true;
     }
 
-    public function deleteGymkhanaCodes_to_validate($gymkhanaId)
+    public static function deleteGymkhanaCodes_to_validate($gymkhanaId)
     {
         Code_to_validate::where('id_gymkhana', $gymkhanaId)->delete();
         return true;

@@ -12,6 +12,12 @@ class Code_to_validate extends Model
     public $timestamps = false;
     protected $table = 'codes_to_validate';
 
+    protected $fillable = [
+        'id_user',
+        'id_gymkhana',
+        'id_code',
+        'privilege'
+    ];
 
 
 

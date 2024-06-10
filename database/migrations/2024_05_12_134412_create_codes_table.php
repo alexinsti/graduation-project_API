@@ -16,6 +16,7 @@ return new class extends Migration
             $table->longtext('code_pic')->charset('binary');//LONGBLOB
             $table->geometry('location', subtype: 'point', srid: 4326);
             $table->tinyInteger('availability');
+            $table->tinyInteger('reported')->default(0);
 
         });
     }

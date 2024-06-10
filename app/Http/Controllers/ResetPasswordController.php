@@ -14,16 +14,16 @@ class ResetPasswordController extends Controller
 {
     public function passwordEmail(Request $request) {
         $request->validate(['email' => ['required', 'email']]);
-     
+
         $status = Password::sendResetLink(
             $request->only('email')
         );
-     
+
         return $status === Password::RESET_LINK_SENT
                     ? back()->with(['status' => __($status)])
                     : back()->withErrors(['email' => __($status)]);
     }
-    
+
     public function passwordReset(string $token) {
         return view('auth.reset-password', ['token' => $token]);
     }
@@ -34,23 +34,21 @@ class ResetPasswordController extends Controller
             'email' => ['required','email'],
             'password' => ['required','confirmed'],
         ]);
-     
+
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user, string $password) {
                 $user->forceFill([
                     'password' => Hash::make($password)
-                ])->setRememberToken(Str::random(60));
-     
+                ]);
+
                 $user->save();
-     
-                event(new PasswordReset($user));
             }
         );
-     
+
         if ($status === Password::PASSWORD_RESET) {
             // Redirigir a una vista que contenga el script para cerrar el navegador
-            return view('close-browser')->with('status', __($status));
+            return view('resetting-password-close-browser')->with('status', __($status));
         } else {
             return back()->withErrors(['email' => [__($status)]]);
         }
