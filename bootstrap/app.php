@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/codes',
             'api/register',
             'api/login',
-            'forgot-password'
+            'forgot-password',
+            'close-ticket/{token}'
         ]);
 })->create();

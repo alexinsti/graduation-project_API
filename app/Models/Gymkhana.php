@@ -19,11 +19,11 @@ class Gymkhana extends Model
         'name',
         'password',
         'description',
-        'amount_of_codes',
         'starting_point',
         'gymkhana_pic',
         'state',
         'availability',
+        'reported',
     ];
 
     protected $casts = [

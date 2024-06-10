@@ -15,6 +15,7 @@ class Relation extends Model
         'id_user',
         'id_code',
         'privilege',
+        'follow',
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
